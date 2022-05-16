@@ -49,16 +49,33 @@ ROS的作用：增加机器人研发过程中软件复用率。(***不要重复�
 > `build`: 编译空间<br>
 > `devel`: 开发空间<br>
 >`install`: 安装空间<br>
-
+---
+> 工作空间目录:  
+> + `src`
+>     - `CmakeLists`
+>     - 各种功能包
+>         * `CmakeLists`
+>         * 自定义消息类型
+>         * `package.xml`: 功能包的描述信息
+>         * 源码(`.cpp`或`.py`)
+> + `devel`
+>     - 各种`setup.*sh`
+>     - `lib`
+>         * 编译生成的功能包
+>     - share
+> + `build`
+> + `install`
+---
 **创建工作空间**:<br>
 1. 创建`src`文件夹，在目录下`catkin_init_workspace`，会生成`Cmake`文件
-2. 编译工作空间，到`src`上级目录中`catkon_make`，生成`build`文件夹和`devel`文件夹
+2. 编译工作空间，到`src`上级目录中`catkin_make`，生成`build`文件夹和`devel`文件夹
 3. 执行`devel/setup.*sh`设置环境变量
 4. `catkin_make install`生成安装空间<br>
+
 **创建功能包**  
 1. 在`src`路径下使用`catkin_create_pkg <package_name> [depend1] [depend2] [depend3]`创建<br>
 功能包并指明依赖  
-2. 编译功能包，在`src`路径下`catkin_make`编译功能包
+2. 编译功能包，在**根目录**下`catkin_make`编译功能包
 ------------------------
 ## 4.发布者Publisher的编程实现(让小海龟动起来)
 + 创建功能包(包含`rospy,roscpp,std_msgs,geometry_msgs,turtlesim`依赖)
@@ -76,4 +93,27 @@ ROS的作用：增加机器人研发过程中软件复用率。(***不要重复�
     - 初始化ROS节点
     - 订阅需要的话题
     - 循环等待话题消息，接收到消息后进入回调函数
-    - 在回调函数里完成消息处理
+    - 在回调函数里完成消息处理  
+---
+## 6. 自定义话题消息
++ 定义msg文件(与编程语言无关，在功能包中创建msg文件夹，在其中定义`*.msg`)
++ 在`package.xml`中添动态生成话题消息的功能包依赖:  
+``` xml 
+    <build_depend>message_generation</build_depend>  
+    <exec_depend>message_runtime</exec_depend>
+```
+***<font color=red>注意：`python`到这就可以了，在python文件中可以直接`import`消息类型</font>***  
+
+---
+## 7. 客户端Client的编程实现
++ 初始化ROS节点
++ 创建一个Client实例
++ 发布服务请求数据
++ 等待Server处理之后的应答结果  
+> `python`中使用`rospy.ServiceProxy()`进行服务的定义
+---
+## 8. 服务端Server的编程实现
++ 初始化ROS节点
++ 创建一个Server实例
++ 循环等待服务请求，进入回调函数
++ 在回调函数中完成服务功能的处理，并反馈应答数据
